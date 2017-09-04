@@ -54,6 +54,7 @@ describe('Authentication responses', function() {
     .set('Authorization', JWT)
     .expect(200)
     .then(response => {
+      console.log("response", JSON.stringify(response.body));
       assert(response.body.data.user.username, 'test');
       done();
     });
@@ -83,7 +84,7 @@ describe('Authentication responses', function() {
 
   // delete test user - 401 unauthorized (we're not logged in)
   it('Delete user without authentication, should return 401 Unauthorized', function(done) {
-    api.del('/signup')
+    api.del('/user')
     .send({ username: 'test', email: 'test2@test.com', password: 'test' })
     .set('Accept', 'application/json')
     .expect(401, done);
@@ -116,7 +117,7 @@ describe('Authentication responses', function() {
 
   // delete test user - logs you out
   it('Delete user with authentication should return 200 and log you out', function(done) {
-    api.del('/signup')
+    api.del('/user')
     .set('Authorization', JWT)
     .set('Accept', 'application/json')
     .send({ username: 'test', email: 'test2@test.com', password: 'test' })
