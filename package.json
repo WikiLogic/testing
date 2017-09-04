@@ -9,6 +9,7 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "async": "^2.5.0",
     "chai": "^4.1.2",
     "mocha": "^3.5.0",
     "supertest": "^3.0.0"
