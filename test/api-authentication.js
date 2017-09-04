@@ -91,12 +91,12 @@ describe('Authentication responses', function() {
   });
 
   // test user login, correct username, wrong password - credential error
-  it('Login request with wrong password should return 400 Bad Request error', function(done) {
+  it('Login request with wrong password should return 401 Unauthorized', function(done) {
     api.post('/login')
     .send({ username: 'test', password: 'wrong' })
     .set('Accept', 'application/json')
     .expect('Content-Type', /json/)
-    .expect(400, done);
+    .expect(401, done);
   });
 
   // test user login correct username, correct password - logged in!
@@ -129,6 +129,6 @@ describe('Authentication responses', function() {
     api.post('/login')
     .send({ username: 'test', password: 'test' })
     .set('Accept', 'application/json')
-    .expect(200, done);
+    .expect(401, done);
   });
 });
