@@ -27,6 +27,13 @@ describe('Authentication responses', function() {
     .expect(400, done);
   });
 
+  it('Login with test credentials should return 400 Bad client request', function(done) {
+    api.post('/login')
+    .send({ username: 'test', password: 'test' })
+    .set('Accept', 'application/json')
+    .expect(400, done);
+  });
+
   // sign up test user, no password - sign up fail, need password
   it('Signup request with empty params should return 400 Bad Request error', function(done) {
     api.post('/signup')
@@ -100,7 +107,7 @@ describe('Authentication responses', function() {
     .send({ username: 'test', password: 'wrong' })
     .set('Accept', 'application/json')
     .expect('Content-Type', /json/)
-    .expect(401, done);
+    .expect(400, done);
   });
 
   // test user login correct username, correct password - logged in!
@@ -127,43 +134,6 @@ describe('Authentication responses', function() {
     .set('Authorization', JWT)
     .set('Accept', 'application/json')
     .send({ username: 'test', email: 'test2@test.com', password: 'test' })
-    .then(() => {
-      api.post('/login')
-      .send({ username: 'test', password: 'test' })
-      .set('Accept', 'application/json')
-      .expect(200)
-      .then(response => {
-        console.log('response', JSON.stringify(response));
-        done();
-      }).catch((err) => {
-        console.log("test promise error?", err);
-      });
-    });
-    // async.series([
-    //   function(cb) { 
-    //     api.del('/user')
-    //     .set('Authorization', JWT)
-    //     .set('Accept', 'application/json')
-    //     .send({ username: 'test', email: 'test2@test.com', password: 'test' })
-    //     .expect(200, cb);
-    //   },
-    //   function(cb) { 
-    //     api.post('/login')
-    //     .send({ username: 'test', password: 'test' })
-    //     .set('Accept', 'application/json')
-    //     .expect(401)
-    //     .then(response => {
-    //       console.log('response', JSON.stringify(response));
-    //       cb();
-    //     }).catch((err) => {
-    //       console.log("test promise error?", err);
-    //     });
-    //   }
-    // ], done);
-
+    .expect(200, done);
   });
-
-  // login with test user - returns credential error
-  // it('Logging in with the user that we just deleted should return 401 unauthorized', function(done) {
-  // });
 });
