@@ -19,7 +19,7 @@ describe('Authentication responses', function() {
   let JWT = '';
 
   // log in with no username - returns credential error
-  it('Login request with empty params should return 400 Bad Request error', function(done) {
+  it('Login request with empty username & password should return 400 Bad Request error', function(done) {
     api.post('/login')
     .send({ username: '', password: '' })
     .set('Accept', 'application/json')
@@ -27,7 +27,8 @@ describe('Authentication responses', function() {
     .expect(400, done);
   });
 
-  it('Login with test credentials should return 400 Bad client request', function(done) {
+  //test user doesn't exist yet
+  it('Login for a username that doesn\'t exist yet should return 400 Bad client request', function(done) {
     api.post('/login')
     .send({ username: 'test', password: 'test' })
     .set('Accept', 'application/json')
@@ -35,7 +36,7 @@ describe('Authentication responses', function() {
   });
 
   // sign up test user, no password - sign up fail, need password
-  it('Signup request with empty params should return 400 Bad Request error', function(done) {
+  it('Signup request with empty email & password should return 400 Bad Request error', function(done) {
     api.post('/signup')
     .send({ username: 'test', email: '', password: '' })
     .set('Accept', 'application/json')
@@ -43,13 +44,17 @@ describe('Authentication responses', function() {
   });
 
   // sign up test user, with password - signs you up! Return user object & token
-  it('Signup request with correctly formatted data should return 200, the new user object, and a JWT', function(done) {
+  it('Signup request should return 200 and the relevant data', function(done) {
     api.post('/signup')
     .send({ username: 'test', email: 'test@test.com', password: 'test' })
     .set('Accept', 'application/json')
     .expect(200)
     .then(response => {
-      assert(response.body.data.user.username, 'test');
+
+      assert(response.body.data.user.username == 'test', 'The new user should have the username we signed up with');
+      var datetime = new Date().toISOString().replace(/T/, ' ').substr(0, 10);
+      assert(response.body.data.user.signUpDate == datetime, 'The new user\'s sign up date should be today');
+
       JWT = `JWT ${response.body.data.token}`;
       done();
     }).catch((err) => {
@@ -58,7 +63,7 @@ describe('Authentication responses', function() {
   });
 
 
-  it('After sign up it should allow you to get the relevant user info', function(done) {
+  it('After sign up it should allow you to get your user info', function(done) {
     api.get('/user')
     .set('Accept', 'application/json')
     .set('Authorization', JWT)
@@ -76,7 +81,7 @@ describe('Authentication responses', function() {
   // log out with the jwt - should log you out
 
   // sign up with test username - sign up error, username already exists (possibly do this with controversial words...?)
-  it('Signup request with a username that is already taken, should return 400 Bad Request error', function(done) {
+  it('Signup request with an existing username should return 400 Bad Request error', function(done) {
     api.post('/signup')
     .send({ username: 'test', email: 'test2@test.com', password: 'test' })
     .set('Accept', 'application/json')
@@ -84,7 +89,7 @@ describe('Authentication responses', function() {
   });
   
   // sign up with test email - sign up error, email already exists
-  it('Signup request with an email that is already taken, should return 400 Bad Request error', function(done) {
+  it('Signup request with an existing email should return 400 Bad Request error', function(done) {
     api.post('/signup')
     .send({ username: 'test2', email: 'test@test.com', password: 'test' })
     .set('Accept', 'application/json')
@@ -111,7 +116,7 @@ describe('Authentication responses', function() {
   });
 
   // test user login correct username, correct password - logged in!
-  it('Login request with correct params should return 200, the user object, and a JWT', function(done) {
+  it('Login request should return 200 and the relevant data', function(done) {
     api.post('/login')
     .send({ username: 'test', password: 'test' })
     .set('Accept', 'application/json')
@@ -129,7 +134,7 @@ describe('Authentication responses', function() {
   // test user login again... ???
 
   // delete test user - logs you out
-  it('Delete user with authentication should return 200 and log you out so you can\'t log in again', function(done) {
+  it('Delete user with authentication should return 200 and log you out', function(done) {
     api.del('/user')
     .set('Authorization', JWT)
     .set('Accept', 'application/json')
