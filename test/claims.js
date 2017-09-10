@@ -6,15 +6,18 @@ var assert = require('chai').assert;
 var supertest = require('supertest');
 var api = supertest('http://localhost/api');
 var async = require('async');
+var credentials = require('../api-credentials.json')
 
 describe('Testing the /claims route', function() {
   let JWT = '';
   let testClaim = {};
 
+  
   //be sure to be logged in
   it('The log in credentials you passed in should log us in', function(done) {
+    console.log(' ----- credentials', JSON.stringify(credentials));
     api.post('/login')
-    .send({ username: process.env.UN, password: process.env.PW })
+    .send({ username: credentials.username, password: credentials.password })
     .set('Accept', 'application/json')
     .expect('Content-Type', /json/)
     .expect(200)
