@@ -6,7 +6,12 @@ var assert = require('chai').assert;
 var supertest = require('supertest');
 var api = supertest('http://localhost/api');
 var async = require('async');
-var credentials = require('../api-credentials.json')
+var credentials;
+try {
+  credentials = require('../api-credentials.json');
+} catch(err) {
+  throw 'You need to create a api-credentials.json file in the root of this testing repo, rename api-credentials-example.json and add your api login';
+}
 
 describe('Testing the /claims route', function() {
   let JWT = '';
