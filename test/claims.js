@@ -20,7 +20,6 @@ describe('Testing the /claims route', function() {
   
   //be sure to be logged in
   it('The log in credentials you passed in should log us in', function(done) {
-    console.log(' ----- credentials', JSON.stringify(credentials));
     api.post('/login')
     .send({ username: credentials.username, password: credentials.password })
     .set('Accept', 'application/json')
@@ -34,19 +33,17 @@ describe('Testing the /claims route', function() {
     });
   });
 
-  //Create a claim
-  it('Posting claim data to /claims should create a new claim', function(done) {
+  //Create a claim - if the claim already exists the existing one should just be returned but with an error in the errors array
+  it('Posting claim data to /claims should return a claim', function(done) {
     api.post('/claims')
     .send({ text: 'MochaTest', probability: '55' })
     .set('Accept', 'application/json')
     .set('Authorization', JWT)
     .expect(200)
-    .then(response => {
+    .then((response) => {
       
       assert(response.body.data.claim.text == 'MochaTest', 'Returned new claim should have the text we set');
-      assert(response.body.data.claim.probability == '55', 'Returned new claim should have the initial probability we set');
       assert.exists(response.body.data.claim.id, 'Returned new claim should have an .id');
-
       testClaim = response.body.data.claim;
       
       done();
@@ -56,19 +53,30 @@ describe('Testing the /claims route', function() {
   });
 
   //Create a claim with the same text - should fail
-  it('Posting claim with duplicate text should fail', function(done) {
+  it('Posting claim with duplicate text should return the existing claim but also an error object', function(done) {
     api.post('/claims')
     .send({ text: 'MochaTest', probability: '55' })
     .set('Accept', 'application/json')
-    .expect(400, done);
+    .set('Authorization', JWT)
+    .expect(200)
+    .then((response) => {
+
+      assert(response.body.data.claim.text == 'MochaTest', 'Returned new claim should have the text we set');
+      assert.exists(response.body.data.claim.id, 'Returned new claim should have an .id');
+      testClaim = response.body.data.claim;
+
+      assert(response.body.errors.length > 0, 'Trying to create a claim that already exists should prompt an error in the api response');
+      done();
+    });
   });
 
   //get the claim we just created
-  it('Should return ', function(done) {
+  it('Getting the claim we just created by it\'s id Should return that claim', function(done) {
     api.get(`/claims/${testClaim.id}`)
     .set('Accept', 'application/json')
+    .set('Authorization', JWT)
     .expect(200)
-    .then(response => {
+    .then((response) => {
       
       assert(response.body.data.claim.text == testClaim.text, 'Returned claim should have the text we\'re expecting');
       assert(response.body.data.claim.probability == testClaim.probability, 'Returned claim should still have the initial probability we set');
@@ -77,7 +85,7 @@ describe('Testing the /claims route', function() {
       done();
     }).catch((err) => {
       console.log("test promise error?", err);
-    });;
+    });
   });
 
   //Edit the claim we just created
