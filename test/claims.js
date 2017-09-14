@@ -88,6 +88,22 @@ describe('Testing the /claims route', function() {
     });
   });
 
+  //search for the claim we just created
+  it('Searching for the claim we just created should return the claim', function(done){
+    api.get(`/claims?s=${testClaim.text}`)
+    .set('Accept', 'application/json')
+    .set('Authorization', JWT)
+    .expect(200)
+    .then((response) => {
+      
+      assert(response.body.data.results.length > 0, 'The search should return at least one thing');
+      
+      done();
+    }).catch((err) => {
+      console.log("test promise error?", err);
+    });
+  });
+
   //Edit the claim we just created
 
   //Delete the claim we just created
