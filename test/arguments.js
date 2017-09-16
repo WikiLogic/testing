@@ -30,11 +30,8 @@ describe('Testing the /claims route', function() {
   
   //be sure to be logged in
   it('The log in credentials you set should log us in', function(done) {
-    api.post('/login')
-    .send({ username: credentials.username, password: credentials.password })
-    .set('Accept', 'application/json')
-    .expect('Content-Type', /json/)
-    .expect(200)
+    api.post('/login').send({ username: credentials.username, password: credentials.password })
+    .set('Accept', 'application/json').expect('Content-Type', /json/).expect(200)
     .then(response => {
       JWT = `JWT ${response.body.data.token}`;
       done();
@@ -45,11 +42,8 @@ describe('Testing the /claims route', function() {
 
   // create the claim off which we're going to start doing argument testing
   it('Creating a new claim for the sake of argument testing, should work', function(done) {
-    api.post('/claims')
-    .send({ text: 'ARG_TEST top claim', probability: '50' })
-    .set('Accept', 'application/json')
-    .set('Authorization', JWT)
-    .expect(200)
+    api.post('/claims').send({ text: 'ARG_TEST top claim', probability: '50' })
+    .set('Accept', 'application/json').set('Authorization', JWT).expect(200)
     .then((response) => {
       argTestClaims.top = response.body.data.claim;
       done();
@@ -60,11 +54,8 @@ describe('Testing the /claims route', function() {
 
   // create  claim off which we're going to start doing argument testing
   it('Creating a new claim for the sake of argument testing, should work', function(done) {
-    api.post('/claims')
-    .send({ text: 'ARG_TEST claim against 1', probability: '50' })
-    .set('Accept', 'application/json')
-    .set('Authorization', JWT)
-    .expect(200)
+    api.post('/claims').send({ text: 'ARG_TEST claim against 1', probability: '50' })
+    .set('Accept', 'application/json').set('Authorization', JWT).expect(200)
     .then((response) => {
       argTestClaims.against1 = response.body.data.claim;
       done();
@@ -73,11 +64,8 @@ describe('Testing the /claims route', function() {
     });
   });
   it('Creating a new claim for the sake of argument testing, should work', function(done) {
-    api.post('/claims')
-    .send({ text: 'ARG_TEST claim against 2', probability: '50' })
-    .set('Accept', 'application/json')
-    .set('Authorization', JWT)
-    .expect(200)
+    api.post('/claims').send({ text: 'ARG_TEST claim against 2', probability: '50' })
+    .set('Accept', 'application/json').set('Authorization', JWT).expect(200)
     .then((response) => {
       argTestClaims.against2 = response.body.data.claim;
       done();
@@ -86,11 +74,8 @@ describe('Testing the /claims route', function() {
     });
   });
   it('Creating a new claim for the sake of argument testing, should work', function(done) {
-    api.post('/claims')
-    .send({ text: 'ARG_TEST claim for 1', probability: '50' })
-    .set('Accept', 'application/json')
-    .set('Authorization', JWT)
-    .expect(200)
+    api.post('/claims').send({ text: 'ARG_TEST claim for 1', probability: '50' })
+    .set('Accept', 'application/json').set('Authorization', JWT).expect(200)
     .then((response) => {
       argTestClaims.for1 = response.body.data.claim;
       done();
@@ -99,11 +84,8 @@ describe('Testing the /claims route', function() {
     });
   });
   it('Creating a new claim for the sake of argument testing, should work', function(done) {
-    api.post('/claims')
-    .send({ text: 'ARG_TEST claim for 2', probability: '50' })
-    .set('Accept', 'application/json')
-    .set('Authorization', JWT)
-    .expect(200)
+    api.post('/claims').send({ text: 'ARG_TEST claim for 2', probability: '50' })
+    .set('Accept', 'application/json').set('Authorization', JWT).expect(200)
     .then((response) => {
       argTestClaims.for2 = response.body.data.claim;
       done();
@@ -121,8 +103,38 @@ describe('Testing the /claims route', function() {
   //invent a new argument and add it to that claim
   it('Posting a new argument to the claim we just created should return that claim with arguments attached', function(done) {
     api.post('/argument')
-    .send({ text: 'ArgumentTest', probability: '50' })
+    .send({ 
+      parentClaimId: argTestClaims.top.id, //pass the id of the first 'top' claim we created above
+      type: 'FOR',
+      premisIds: [argTestClaims.for1.id, argTestClaims.for2.id], //give the ids of the two 'for' claims we created above
+      probability: '50'
+    })
+    .set('Accept', 'application/json').set('Authorization', JWT)
+    .expect(200)
+    .then((response) => {
+      let hasFor1 = false, hasFor2 = false;
+      let returnedArgs = response.body.data.claim.args;
+      
+      assert(response.body.data.claim.id == argTestClaims.top.id, 'The parent claim should be the one returned');
+      assert(response.body.data.claim.args.length > 0, 'The claim should now have at least 1 argument');
 
+      for (var a = 0; a < returnedArgs.length; a++) {
+        for (var c = 0; c < returnedArgs[a].premisIds.length; c++) {
+          if (returnedArgs[a].premisIds[c] == argTestClaims.for1.id) {
+            hasFor1 = true;
+          }
+          if (returnedArgs[a].premisIds[c] == argTestClaims.for2.id) {
+            hasFor2 = true;
+          }
+        }
+      }
+
+      assert((hasFor1 && hasFor2), 'The claim should have the argument we passed to it');
+
+      done();
+    }).catch((err) => {
+      console.log("test promise error?", err);
+    });
   });
 
 });
