@@ -147,6 +147,8 @@ describe('Testing the /claims route', function() {
     .then((response) => {
       let hasFor1 = false, hasFor2 = false;
       let returnedArgs = response.body.data.claim.arguments;
+
+      console.log('response.body.data.claim', response.body.data.claim)
       
       assert(response.body.data.claim.arguments.length > 0, 'The claim should now have at least 1 argument');
 
