@@ -145,25 +145,22 @@ describe('Testing the /claims route', function() {
     .set('Authorization', JWT)
     .expect(200)
     .then((response) => {
-      let hasFor1 = false, hasFor2 = false;
+      let hasForGroup = 0;
       let returnedArgs = response.body.data.claim.arguments;
-
-      console.log('response.body.data.claim', response.body.data.claim)
-      
+     
       assert(response.body.data.claim.arguments.length > 0, 'The claim should now have at least 1 argument');
 
       for (var a = 0; a < returnedArgs.length; a++) {
-        for (var c = 0; c < returnedArgs[a].premisIds.length; c++) {
-          if (returnedArgs[a].premisIds[c] == argTestClaims.for1.id) {
-            hasFor1 = true;
-          }
-          if (returnedArgs[a].premisIds[c] == argTestClaims.for2.id) {
-            hasFor2 = true;
-          }
+        if (
+          returnedArgs[a].premisIds[0] == argTestClaims.for1.id && returnedArgs[a].premisIds[1] == argTestClaims.for2.id
+          || returnedArgs[a].premisIds[0] == argTestClaims.for2.id && returnedArgs[a].premisIds[1] == argTestClaims.for1.id
+        ) {
+          hasForGroup ++;
         }
       }
 
-      assert((hasFor1 && hasFor2), 'The claim should have the argument we passed to it');
+      assert((hasForGroup > 0), 'The claim should have the argument we passed to it');
+      assert((hasForGroup == 1), 'The claim should not have duplicates of the argument we passed to it');
       
       done();
     }).catch((err) => {
