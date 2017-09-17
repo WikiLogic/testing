@@ -102,7 +102,7 @@ describe('Testing the /claims route', function() {
 
   //invent a new argument and add it to that claim
   it('Posting a new argument to the claim we just created should return that claim with arguments attached', function(done) {
-    api.post('/argument')
+    api.post('/arguments')
     .send({ 
       parentClaimId: argTestClaims.top.id, //pass the id of the first 'top' claim we created above
       type: 'FOR',
@@ -113,10 +113,10 @@ describe('Testing the /claims route', function() {
     .expect(200)
     .then((response) => {
       let hasFor1 = false, hasFor2 = false;
-      let returnedArgs = response.body.data.claim.args;
+      let returnedArgs = response.body.data.claim.arguments;
       
       assert(response.body.data.claim.id == argTestClaims.top.id, 'The parent claim should be the one returned');
-      assert(response.body.data.claim.args.length > 0, 'The claim should now have at least 1 argument');
+      assert(response.body.data.claim.arguments.length > 0, 'The claim should now have at least 1 argument');
 
       for (var a = 0; a < returnedArgs.length; a++) {
         for (var c = 0; c < returnedArgs[a].premisIds.length; c++) {
