@@ -137,4 +137,38 @@ describe('Testing the /claims route', function() {
     });
   });
 
+  it('Getting the top claim - it should return with the argument we just created', function(done){
+
+    //should not be multiple arguments with the same premiseIds
+    api.get(`/claims/${argTestClaims.top.id}`)
+    .set('Accept', 'application/json')
+    .set('Authorization', JWT)
+    .expect(200)
+    .then((response) => {
+      let hasFor1 = false, hasFor2 = false;
+      let returnedArgs = response.body.data.claim.arguments;
+      
+      assert(response.body.data.claim.arguments.length > 0, 'The claim should now have at least 1 argument');
+
+      for (var a = 0; a < returnedArgs.length; a++) {
+        for (var c = 0; c < returnedArgs[a].premisIds.length; c++) {
+          if (returnedArgs[a].premisIds[c] == argTestClaims.for1.id) {
+            hasFor1 = true;
+          }
+          if (returnedArgs[a].premisIds[c] == argTestClaims.for2.id) {
+            hasFor2 = true;
+          }
+        }
+      }
+
+      assert((hasFor1 && hasFor2), 'The claim should have the argument we passed to it');
+      
+      done();
+    }).catch((err) => {
+      console.log("test promise error?", err);
+    });
+  });
+
+  //test the probability stuff
+
 });
