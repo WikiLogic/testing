@@ -114,6 +114,7 @@ describe('Testing the /claims route', function() {
     .then((response) => {
       let hasFor1 = false, hasFor2 = false;
       let returnedArgs = response.body.data.claim.arguments;
+      argTestClaims.forArg = response.body.data.claim.arguments;
       
       assert(response.body.data.claim.id == argTestClaims.top.id, 'The parent claim should be the one returned');
       assert(response.body.data.claim.arguments.length > 0, 'The claim should now have at least 1 argument');
@@ -181,6 +182,7 @@ describe('Testing the /claims route', function() {
     .then((response) => {
       let hasFor1 = false, hasFor2 = false;
       let returnedArgs = response.body.data.claim.arguments;
+      argTestClaims.againstArg = response.body.data.claim.arguments;
       
       assert(response.body.data.claim.id == argTestClaims.top.id, 'The parent claim should be the one returned');
       assert(response.body.data.claim.arguments.length > 1, 'The claim should now have at least 2 arguments');
@@ -194,9 +196,17 @@ describe('Testing the /claims route', function() {
   //test the probability stuff
 
 
-  //remove the testing data
-
   //remove the arguments (should also remove the premise links)
+  it('Delete for argument', function(done) {
+    api.del('/arguments').send({ argument: argTestClaims.forArg })
+    .set('Accept', 'application/json').set('Authorization', JWT)
+    .expect(200, done);
+  });
+  it('Delete against argument', function(done) {
+    api.del('/arguments').send({ argument: argTestClaims.againstArg })
+    .set('Accept', 'application/json').set('Authorization', JWT)
+    .expect(200, done);
+  });
 
   //remove the claims
   it('Delete top claim', function(done) {
