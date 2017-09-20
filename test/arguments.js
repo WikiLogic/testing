@@ -112,7 +112,7 @@ describe('Testing the /claims route', function() {
     .set('Accept', 'application/json').set('Authorization', JWT)
     .expect(200)
     .then((response) => {
-      let hasFor1 = false, hasFor2 = false;
+      let hasForGroup = 0;
       let returnedArgs = response.body.data.claim.arguments;
       argTestClaims.forArg = response.body.data.claim.arguments;
       
@@ -182,7 +182,7 @@ describe('Testing the /claims route', function() {
     .then((response) => {
       let hasFor1 = false, hasFor2 = false;
       let returnedArgs = response.body.data.claim.arguments;
-      argTestClaims.againstArg = response.body.data.claim.arguments;
+      argTestClaims.arguments = response.body.data.claim.arguments;
       
       assert(response.body.data.claim.id == argTestClaims.top.id, 'The parent claim should be the one returned');
       assert(response.body.data.claim.arguments.length > 1, 'The claim should now have at least 2 arguments');
@@ -198,39 +198,39 @@ describe('Testing the /claims route', function() {
 
   //remove the arguments (should also remove the premise links)
   it('Delete for argument', function(done) {
-    api.del('/arguments').send({ argument: argTestClaims.forArg })
+    api.del('/arguments').send({ argument: argTestClaims.arguments[0] })
     .set('Accept', 'application/json').set('Authorization', JWT)
     .expect(200, done);
   });
   it('Delete against argument', function(done) {
-    api.del('/arguments').send({ argument: argTestClaims.againstArg })
+    api.del('/arguments').send({ argument: argTestClaims.arguments[1] })
     .set('Accept', 'application/json').set('Authorization', JWT)
     .expect(200, done);
   });
 
   //remove the claims
   it('Delete top claim', function(done) {
-    api.del('/claims').send({ claim: argTestClaims.top })
+    api.del('/claims').send({ claimid: argTestClaims.top._id })
     .set('Accept', 'application/json').set('Authorization', JWT)
     .expect(200, done);
   });
   it('Delete against 1', function(done) {
-    api.del('/claims').send({ claim: argTestClaims.against1 })
+    api.del('/claims').send({ claimid: argTestClaims.against1._id })
     .set('Accept', 'application/json').set('Authorization', JWT)
     .expect(200, done);
   });
   it('Delete against 1', function(done) {
-    api.del('/claims').send({ claim: argTestClaims.against2 })
+    api.del('/claims').send({ claimid: argTestClaims.against2._id })
     .set('Accept', 'application/json').set('Authorization', JWT)
     .expect(200, done);
   });
   it('Delete for 1', function(done) {
-    api.del('/claims').send({ claim: argTestClaims.for1 })
+    api.del('/claims').send({ claimid: argTestClaims.for1._id })
     .set('Accept', 'application/json').set('Authorization', JWT)
     .expect(200, done);
   });
   it('Delete for 2', function(done) {
-    api.del('/claims').send({ claim: argTestClaims.for2 })
+    api.del('/claims').send({ claimid: argTestClaims.for2._id })
     .set('Accept', 'application/json').set('Authorization', JWT)
     .expect(200, done);
   });
