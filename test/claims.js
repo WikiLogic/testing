@@ -43,7 +43,8 @@ describe('Testing the /claims route', function() {
     .then((response) => {
       
       assert(response.body.data.claim.text == 'MochaTest', 'Returned new claim should have the text we set');
-      assert.exists(response.body.data.claim.id, 'Returned new claim should have an .id');
+      assert.exists(response.body.data.claim._id, 'Returned new claim should have a ._id');
+      assert.exists(response.body.data.claim._key, 'Returned new claim should have a ._key');
       testClaim = response.body.data.claim;
       
       done();
@@ -62,7 +63,8 @@ describe('Testing the /claims route', function() {
     .then((response) => {
 
       assert(response.body.data.claim.text == 'MochaTest', 'Returned new claim should have the text we set');
-      assert.exists(response.body.data.claim.id, 'Returned new claim should have an .id');
+      assert.exists(response.body.data.claim._id, 'Returned new claim should have a ._id');
+      assert.exists(response.body.data.claim._key, 'Returned new claim should have a ._key');
       testClaim = response.body.data.claim;
 
       assert(response.body.errors.length > 0, 'Trying to create a claim that already exists should prompt an error in the api response');
@@ -72,7 +74,7 @@ describe('Testing the /claims route', function() {
 
   //get the claim we just created
   it('Getting the claim we just created by it\'s id Should return that claim', function(done) {
-    api.get(`/claims/${testClaim.id}`)
+    api.get(`/claims/${testClaim._key}`)
     .set('Accept', 'application/json')
     .set('Authorization', JWT)
     .expect(200)
@@ -80,7 +82,7 @@ describe('Testing the /claims route', function() {
       
       assert(response.body.data.claim.text == testClaim.text, 'Returned claim should have the text we\'re expecting');
       assert(response.body.data.claim.probability == testClaim.probability, 'Returned claim should still have the initial probability we set');
-      assert(response.body.data.claim.id == testClaim.id, 'Returned claim should have the id we\'re expecting');
+      assert(response.body.data.claim._id == testClaim._id, 'Returned claim should have the id we\'re expecting');
       
       done();
     }).catch((err) => {
@@ -107,5 +109,9 @@ describe('Testing the /claims route', function() {
   //Edit the claim we just created
 
   //Delete the claim we just created
-
+  it('Delete the test claim', function(done) {
+    api.del('/claims').send({ _key: testClaim._key })
+    .set('Accept', 'application/json').set('Authorization', JWT)
+    .expect(200, done);
+  });
 });
