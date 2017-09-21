@@ -166,7 +166,6 @@ describe('Testing the /claims route', function() {
         assert(returnedArgs[a]._key.indexOf('/') == -1, 'the _key property should match the arango format');
         assert(returnedArgs[a].type, 'each returned argument should have a type property');
         assert(returnedArgs[a].creationDate, 'each returned argument should have a creationDate property');
-        assert(Array.isArray(returnedArgs[a].premisIds), 'each returned argument should have an array of premise ids'); //this might go
       }
 
       done();
