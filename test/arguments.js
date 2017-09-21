@@ -56,7 +56,7 @@ describe('Testing the /claims route', function() {
 
   // create  claim off which we're going to start doing argument testing
   it('Creating a new claim for the sake of argument testing, should work', function(done) {
-    api.post('/claims').send({ text: 'ARG_TEST claim against 1', probability: '50' })
+    api.post('/claims').send({ text: 'ARG_TEST claim against 1', probability: '75' })
     .set('Accept', 'application/json').set('Authorization', JWT).expect(200)
     .then((response) => {
       assert(response.body.data.claim._id, 'returned claim should have an _id');
@@ -68,7 +68,7 @@ describe('Testing the /claims route', function() {
     });
   });
   it('Creating a new claim for the sake of argument testing, should work', function(done) {
-    api.post('/claims').send({ text: 'ARG_TEST claim against 2', probability: '50' })
+    api.post('/claims').send({ text: 'ARG_TEST claim against 2', probability: '75' })
     .set('Accept', 'application/json').set('Authorization', JWT).expect(200)
     .then((response) => {
       assert(response.body.data.claim._id, 'returned claim should have an _id');
@@ -92,7 +92,7 @@ describe('Testing the /claims route', function() {
     });
   });
   it('Creating a new claim for the sake of argument testing, should work', function(done) {
-    api.post('/claims').send({ text: 'ARG_TEST claim for 2', probability: '50' })
+    api.post('/claims').send({ text: 'ARG_TEST claim for 2', probability: '25' })
     .set('Accept', 'application/json').set('Authorization', JWT).expect(200)
     .then((response) => {
       assert(response.body.data.claim._id, 'returned claim should have an _id');
@@ -116,8 +116,7 @@ describe('Testing the /claims route', function() {
     .send({ 
       parentClaimId: argTestClaims.top._key, //pass the id of the first 'top' claim we created above
       type: 'FOR',
-      premisIds: [argTestClaims.for1._key, argTestClaims.for2._key], //give the ids of the two 'for' claims we created above
-      probability: '50'
+      premisIds: [argTestClaims.for1._key, argTestClaims.for2._key] //give the ids of the two 'for' claims we created above
     })
     .set('Accept', 'application/json').set('Authorization', JWT)
     .expect(200)
@@ -127,7 +126,13 @@ describe('Testing the /claims route', function() {
       argTestClaims.forArg = response.body.data.claim.arguments;
       
       assert(response.body.data.claim._id == argTestClaims.top._id, 'The parent claim should be the one returned');
-      assert(response.body.data.claim.arguments.length > 0, 'The claim should now have at least 1 argument');
+      assert(returnedArgs.length > 0, 'The claim should now have at least 1 argument');
+
+      for (var a = 0; a < returnedArgs.length; a++) {
+        returnedArgs[a]
+        assert(returnedArgs[a].probability, 'each argument should have a probability set');
+      }
+
 
       done();
     }).catch((err) => {
@@ -141,8 +146,7 @@ describe('Testing the /claims route', function() {
     .send({ 
       parentClaimId: argTestClaims.top._id, //pass the id of the first 'top' claim we created above
       type: 'AGAINST',
-      premisIds: [argTestClaims.against1._id, argTestClaims.against2._id], //give the ids of the two 'for' claims we created above
-      probability: '50'
+      premisIds: [argTestClaims.against1._id, argTestClaims.against2._id] //give the ids of the two 'for' claims we created above
     })
     .set('Accept', 'application/json').set('Authorization', JWT)
     .expect(200)
@@ -171,44 +175,21 @@ describe('Testing the /claims route', function() {
     });
   });
 
-  // it('Getting the top claim - it should return with the argument we just created', function(done){
-
-  //   //should not be multiple arguments with the same premiseIds
-  //   api.get(`/claims/${argTestClaims.top._key}`)
-  //   .set('Accept', 'application/json')
-  //   .set('Authorization', JWT)
-  //   .expect(200)
-  //   .then((response) => {
-  //     console.log('getting the claim after setting an argument', response.body.data.claim);
-  //     assert(response.body.data.claim.arguments.length > 0, 'The claim should now have at least 1 argument');      
-  //     done();
-  //   }).catch((err) => {
-  //     console.log("test promise error?", err);
-  //   });
-  // });
 
   //test the probability stuff
 
 
   //remove the arguments (should also remove the premise links)
   it('Delete for argument', function(done) {
-    api.del('/arguments').send({ _key: argTestClaims.arguments[0]._key })
+    api.del('/arguments').send({ _id: argTestClaims.arguments[0]._id })
     .set('Accept', 'application/json').set('Authorization', JWT)
-    .then((res) => {
-      console.log('deleted the argument for: ', argTestClaims.arguments);
-      done();
-    })
-    // .expect(200, done);
+    .expect(200, done);
   });
   
   it('Delete against argument', function(done) {
-    api.del('/arguments').send({ _key: argTestClaims.arguments[1]._key })
+    api.del('/arguments').send({ _id: argTestClaims.arguments[1]._id })
     .set('Accept', 'application/json').set('Authorization', JWT)
-    .then((res) => {
-      console.log('deleted the argument against: ', argTestClaims.arguments);
-      done();
-    });
-    // .expect(200, done);
+    .expect(200, done);
   });
 
   //remove the claims
