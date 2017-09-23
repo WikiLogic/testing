@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "mocha"
+    "start": "mocha",
+    "test": "mocha"
   },
   "author": "",
   "license": "ISC",

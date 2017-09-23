@@ -4,7 +4,7 @@
 var should = require('chai').should();
 var assert = require('chai').assert;
 var supertest = require('supertest');
-var api = supertest('http://localhost/api');
+var api = supertest('http://localhost/api/v1');
 var async = require('async');
 
 describe('/test', function() {
