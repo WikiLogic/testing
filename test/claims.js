@@ -20,7 +20,12 @@ describe('Testing the /claims route', function() {
     searchText: 'Mocha',
     probability: '55' 
   }
+  let srcSimilarTestClaim = {
+    text: 'Mocha', 
+    probability: '55' 
+  }
   let testClaim = {};
+  let similarTestClaim = {};
 
   
   //be sure to be logged in
@@ -33,9 +38,7 @@ describe('Testing the /claims route', function() {
     .then(response => {
       JWT = `JWT ${response.body.data.token}`;
       done();
-    }).catch((err) => {
-      console.log("test promise error?", err);
-    });
+    })
   });
 
   //Create a claim - if the claim already exists the existing one should just be returned but with an error in the errors array
@@ -53,12 +56,10 @@ describe('Testing the /claims route', function() {
       testClaim = response.body.data.claim;
       
       done();
-    }).catch((err) => {
-      console.log("test promise error?", err);
-    });
+    })
   });
 
-  //Create a claim with the same text - should fail
+  //Create a claim with the same text - should return the existing claim
   it('Posting claim with duplicate text should return the existing claim but also an error object', function(done) {
     api.post('/claims')
     .send({ text: srcTestClaim.text, probability: srcTestClaim.probability })
@@ -77,6 +78,24 @@ describe('Testing the /claims route', function() {
     });
   });
 
+  //Create a claim with similar text to the one above - should return a new claim, not the one above
+  it('Posting claim with similar text should return a new claim, not the existing one', function(done) {
+    api.post('/claims')
+    .send({ text: srcSimilarTestClaim.text, probability: srcSimilarTestClaim.probability })
+    .set('Accept', 'application/json')
+    .set('Authorization', JWT)
+    .expect(200)
+    .then((response) => {
+
+      assert(response.body.data.claim.text == srcSimilarTestClaim.text, 'Returned new claim should have the text we set');
+      assert.exists(response.body.data.claim._id, 'Returned new claim should have a ._id');
+      assert.exists(response.body.data.claim._key, 'Returned new claim should have a ._key');
+      assert(response.body.errors.length == 0, 'If it was returning an existing claim, there would be errors.');
+      similarTestClaim = response.body.data.claim;
+      done();
+    });
+  });
+
   //get the claim we just created
   it('Getting the claim we just created by it\'s id Should return that claim', function(done) {
     api.get(`/claims/${testClaim._key}`)
@@ -90,9 +109,7 @@ describe('Testing the /claims route', function() {
       assert(response.body.data.claim._id == testClaim._id, 'Returned claim should have the id we\'re expecting');
       
       done();
-    }).catch((err) => {
-      console.log("test promise error?", err);
-    });
+    })
   });
 
   //search for the claim we just created
@@ -106,9 +123,7 @@ describe('Testing the /claims route', function() {
       assert(response.body.data.results.length > 0, 'The search should return at least one thing');
       
       done();
-    }).catch((err) => {
-      console.log("test promise error?", err);
-    });
+    })
   });
 
   //search for the claim we just created
@@ -122,9 +137,7 @@ describe('Testing the /claims route', function() {
       assert(response.body.data.results.length > 0, 'The search should return at least one thing');
       
       done();
-    }).catch((err) => {
-      console.log("test promise error?", err);
-    });
+    })
   });
 
   //Edit the claim we just created
@@ -132,6 +145,12 @@ describe('Testing the /claims route', function() {
   //Delete the claim we just created
   it('Delete the test claim', function(done) {
     api.del('/claims').send({ _key: testClaim._key })
+    .set('Accept', 'application/json').set('Authorization', JWT)
+    .expect(200, done);
+  });
+
+  it('Delete the similar test claim', function(done) {
+    api.del('/claims').send({ _key: similarTestClaim._key })
     .set('Accept', 'application/json').set('Authorization', JWT)
     .expect(200, done);
   });

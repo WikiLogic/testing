@@ -25,6 +25,28 @@ try {
 
 describe('Testing the /claims route', function() {
   let JWT = '';
+  let srcArgTestClaims = {
+    top: {
+      text: 'ARG_TEST top claim',
+      probability: '50'
+    },
+    against1: {
+      text: 'ARG_TEST claim against 1',
+      probability: '75'
+    },
+    against2: {
+      text: 'ARG_TEST claim against 2',
+      probability: '75'
+    },
+    for1: {
+      text: 'ARG_TEST claim for 1',
+      probability: '25'
+    },
+    for2: {
+      text: 'ARG_TEST claim for 2',
+      probability: '25'
+    }
+  }
   let argTestClaims = {};
 
   
@@ -35,73 +57,61 @@ describe('Testing the /claims route', function() {
     .then(response => {
       JWT = `JWT ${response.body.data.token}`;
       done();
-    }).catch((err) => {
-      console.log("test promise error?", err);
-    });
+    })
   });
 
   // create the claim off which we're going to start doing argument testing
   it('Creating a new claim for the sake of argument testing, should work', function(done) {
-    api.post('/claims').send({ text: 'ARG_TEST top claim', probability: '50' })
+    api.post('/claims').send({ text: srcArgTestClaims.top.text, probability: srcArgTestClaims.top.probability })
     .set('Accept', 'application/json').set('Authorization', JWT).expect(200)
     .then((response) => {
       assert(response.body.data.claim._id, 'returned claim should have an _id');
       assert(response.body.data.claim._key, 'returned claim should have a _key');
       argTestClaims.top = response.body.data.claim;
       done();
-    }).catch((err) => {
-      console.log("test promise error?", err);
-    });
+    })
   });
 
   // create  claim off which we're going to start doing argument testing
   it('Creating a new claim for the sake of argument testing, should work', function(done) {
-    api.post('/claims').send({ text: 'ARG_TEST claim against 1', probability: '75' })
+    api.post('/claims').send({ text: srcArgTestClaims.against1.text, probability: srcArgTestClaims.against1.probability })
     .set('Accept', 'application/json').set('Authorization', JWT).expect(200)
     .then((response) => {
       assert(response.body.data.claim._id, 'returned claim should have an _id');
       assert(response.body.data.claim._key, 'returned claim should have a _key');
       argTestClaims.against1 = response.body.data.claim;
       done();
-    }).catch((err) => {
-      console.log("test promise error?", err);
-    });
+    })
   });
   it('Creating a new claim for the sake of argument testing, should work', function(done) {
-    api.post('/claims').send({ text: 'ARG_TEST claim against 2', probability: '75' })
+    api.post('/claims').send({ text: srcArgTestClaims.against2.text, probability: srcArgTestClaims.against2.probability })
     .set('Accept', 'application/json').set('Authorization', JWT).expect(200)
     .then((response) => {
       assert(response.body.data.claim._id, 'returned claim should have an _id');
       assert(response.body.data.claim._key, 'returned claim should have a _key');
       argTestClaims.against2 = response.body.data.claim;
       done();
-    }).catch((err) => {
-      console.log("test promise error?", err);
-    });
+    })
   });
   it('Creating a new claim for the sake of argument testing, should work', function(done) {
-    api.post('/claims').send({ text: 'ARG_TEST claim for 1', probability: '50' })
+    api.post('/claims').send({ text: srcArgTestClaims.for1.text, probability: srcArgTestClaims.for1.probability })
     .set('Accept', 'application/json').set('Authorization', JWT).expect(200)
     .then((response) => {
       assert(response.body.data.claim._id, 'returned claim should have an _id');
       assert(response.body.data.claim._key, 'returned claim should have a _key');
       argTestClaims.for1 = response.body.data.claim;
       done();
-    }).catch((err) => {
-      console.log("test promise error?", err);
-    });
+    })
   });
   it('Creating a new claim for the sake of argument testing, should work', function(done) {
-    api.post('/claims').send({ text: 'ARG_TEST claim for 2', probability: '25' })
+    api.post('/claims').send({ text: srcArgTestClaims.for2.text, probability: srcArgTestClaims.for2.probability })
     .set('Accept', 'application/json').set('Authorization', JWT).expect(200)
     .then((response) => {
       assert(response.body.data.claim._id, 'returned claim should have an _id');
       assert(response.body.data.claim._key, 'returned claim should have a _key');
       argTestClaims.for2 = response.body.data.claim;
       done();
-    }).catch((err) => {
-      console.log("test promise error?", err);
-    });
+    })
   });
 
   // =========================================================== 
@@ -116,7 +126,7 @@ describe('Testing the /claims route', function() {
     .send({ 
       parentClaimId: argTestClaims.top._key, //pass the id of the first 'top' claim we created above
       type: 'FOR',
-      premisIds: [argTestClaims.for1._key, argTestClaims.for2._key] //give the ids of the two 'for' claims we created above
+      premiseIds: [argTestClaims.for1._key, argTestClaims.for2._key] //give the ids of the two 'for' claims we created above
     })
     .set('Accept', 'application/json').set('Authorization', JWT)
     .expect(200)
@@ -135,9 +145,7 @@ describe('Testing the /claims route', function() {
 
 
       done();
-    }).catch((err) => {
-      console.log("test promise error?", err);
-    });
+    })
   });
 
   //also add the against arguments
@@ -146,7 +154,7 @@ describe('Testing the /claims route', function() {
     .send({ 
       parentClaimId: argTestClaims.top._id, //pass the id of the first 'top' claim we created above
       type: 'AGAINST',
-      premisIds: [argTestClaims.against1._id, argTestClaims.against2._id] //give the ids of the two 'for' claims we created above
+      premiseIds: [argTestClaims.against1._id, argTestClaims.against2._id] //give the ids of the two 'for' claims we created above
     })
     .set('Accept', 'application/json').set('Authorization', JWT)
     .expect(200)
@@ -169,11 +177,25 @@ describe('Testing the /claims route', function() {
       }
 
       done();
-    }).catch((err) => {
-      console.log("test promise error?", err);
-    });
+    })
   });
 
+  //getting the parent claim should return the claim with argument data nested within it
+  it('Getting the parent claim Should return the claim with populated argument data', function(done) {
+    api.get(`/claims/${argTestClaims.top._id}`)
+    .set('Accept', 'application/json')
+    .set('Authorization', JWT)
+    .expect(200)
+    .then((response) => {
+      
+      assert(response.body.data.claim.text == srcTestClaim.text, 'Returned claim should have the text we\'re expecting');
+      assert(response.body.data.claim.probability == srcTestClaim.probability, 'Returned claim should still have the initial probability we set');
+      assert(response.body.data.claim._id == testClaim._id, 'Returned claim should have the id we\'re expecting');
+      assert(response.body.data.claim.arguments.length == 2, 'Returned claim should have the the 2 arguments we added');
+      
+      done();
+    })
+  });
 
   //test the probability stuff
 
