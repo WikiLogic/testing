@@ -190,6 +190,8 @@ describe('Testing basic Arguments', function() {
       assert(response.body.data.claim.text == argTestClaims.top.text, 'Returned claim should have the text we\'re expecting');
       assert(response.body.data.claim._id == argTestClaims.top._id, 'Returned claim should have the id we\'re expecting');
       assert(response.body.data.claim.arguments.length == 2, 'Returned claim should have the the 2 arguments we added');
+      assert(response.body.data.claim.arguments[0].hasOwnProperty('premises'), 'The arguments in the claim should have an array of premises');
+      assert(response.body.data.claim.arguments[0].premises[0].hasOwnProperty('_id'), 'The premises in the argument should be populated');
       
       done();
     })
