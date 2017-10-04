@@ -23,7 +23,7 @@ try {
 //          claim for 2
 
 
-describe('Testing the /claims route', function() {
+describe('Testing basic Arguments', function() {
   let JWT = '';
   let srcArgTestClaims = {
     top: {
@@ -182,15 +182,13 @@ describe('Testing the /claims route', function() {
 
   //getting the parent claim should return the claim with argument data nested within it
   it('Getting the parent claim Should return the claim with populated argument data', function(done) {
-    api.get(`/claims/${argTestClaims.top._id}`)
+    api.get(`/claims/${argTestClaims.top._key}`)
     .set('Accept', 'application/json')
     .set('Authorization', JWT)
     .expect(200)
     .then((response) => {
-      
-      assert(response.body.data.claim.text == srcTestClaim.text, 'Returned claim should have the text we\'re expecting');
-      assert(response.body.data.claim.probability == srcTestClaim.probability, 'Returned claim should still have the initial probability we set');
-      assert(response.body.data.claim._id == testClaim._id, 'Returned claim should have the id we\'re expecting');
+      assert(response.body.data.claim.text == argTestClaims.top.text, 'Returned claim should have the text we\'re expecting');
+      assert(response.body.data.claim._id == argTestClaims.top._id, 'Returned claim should have the id we\'re expecting');
       assert(response.body.data.claim.arguments.length == 2, 'Returned claim should have the the 2 arguments we added');
       
       done();

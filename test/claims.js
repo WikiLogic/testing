@@ -13,7 +13,7 @@ try {
   throw 'You need to create a api-credentials.json file in the root of this testing repo, rename api-credentials-example.json and add your api login';
 }
 
-describe('Testing the /claims route', function() {
+describe('Testing basic Claims', function() {
   let JWT = '';
   let srcTestClaim = { 
     text: 'Mocha test claim', 
@@ -90,7 +90,7 @@ describe('Testing the /claims route', function() {
       assert(response.body.data.claim.text == srcSimilarTestClaim.text, 'Returned new claim should have the text we set');
       assert.exists(response.body.data.claim._id, 'Returned new claim should have a ._id');
       assert.exists(response.body.data.claim._key, 'Returned new claim should have a ._key');
-      assert(response.body.errors.length == 0, 'If it was returning an existing claim, there would be errors.');
+      assert(!response.body.hasOwnProperty('errors'), 'If it was returning an existing claim, there would be errors.');
       similarTestClaim = response.body.data.claim;
       done();
     });
