@@ -15,7 +15,7 @@ describe('/test', function() {
   });
 });
 
-describe('Authentication responses', function() {
+describe('Authentication & setting up test user for the other tests', function() {
   let JWT = '';
 
   // log in with no username - returns credential error
@@ -140,5 +140,25 @@ describe('Authentication responses', function() {
     .set('Accept', 'application/json')
     .send({ username: 'test', email: 'test2@test.com', password: 'test' })
     .expect(200, done);
+  });
+
+
+  //------------------Finally, leave the test user in for the rest of the tests to use - we'll have to clear him out at the end
+  it('Signup request should return 200 and the relevant data', function(done) {
+    api.post('/signup')
+    .send({ username: 'test', email: 'test@test.com', password: 'test' })
+    .set('Accept', 'application/json')
+    .expect(200)
+    .then(response => {
+
+      assert(response.body.data.user.username == 'test', 'The new user should have the username we signed up with');
+      var datetime = new Date().toISOString().replace(/T/, ' ').substr(0, 10);
+      assert(response.body.data.user.signUpDate == datetime, 'The new user\'s sign up date should be today');
+
+      JWT = `JWT ${response.body.data.token}`;
+      done();
+    }).catch((err) => {
+      console.log("test promise error?", err);
+    });
   });
 });

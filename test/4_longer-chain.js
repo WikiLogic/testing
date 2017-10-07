@@ -6,12 +6,6 @@ var assert = require('chai').assert;
 var supertest = require('supertest');
 var api = supertest('http://localhost/api/v1');
 var async = require('async');
-var credentials;
-try {
-  credentials = require('../api-credentials.json');
-} catch(err) {
-  throw 'You need to create a api-credentials.json file in the root of this testing repo, rename api-credentials-example.json and add your api login';
-}
 
 describe('Testing a slightly longer chain', function() {
   let JWT = '';
@@ -33,8 +27,9 @@ describe('Testing a slightly longer chain', function() {
 
   
   //be sure to be logged in
-  it('The log in credentials you set in api-credentials.json should log us in (the account should already exist)', function(done) {
-    api.post('/login').send({ username: credentials.username, password: credentials.password })
+  it('Log in with the test user', function(done) {
+    api.post('/login')
+    .send({ username: 'test', password: 'test' })
     .set('Accept', 'application/json').expect('Content-Type', /json/).expect(200)
     .then(response => {
       JWT = `JWT ${response.body.data.token}`;
