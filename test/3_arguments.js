@@ -51,7 +51,7 @@ describe('Testing basic Arguments', function() {
 
   
   //be sure to be logged in
-  it('The log in credentials you set should log us in', function(done) {
+  it('The log in credentials you set in api-credentials.json should log us in (the account should already exist)', function(done) {
     api.post('/login').send({ username: credentials.username, password: credentials.password })
     .set('Accept', 'application/json').expect('Content-Type', /json/).expect(200)
     .then(response => {
@@ -124,9 +124,9 @@ describe('Testing basic Arguments', function() {
   it('Posting a new argument to the claim we just created should return that claim with arguments attached', function(done) {
     api.post('/arguments')
     .send({ 
-      parentClaimId: argTestClaims.top._key, //pass the id of the first 'top' claim we created above
+      parentClaimId: argTestClaims.top._id, //pass the id of the first 'top' claim we created above
       type: 'FOR',
-      premiseIds: [argTestClaims.for1._key, argTestClaims.for2._key] //give the ids of the two 'for' claims we created above
+      premiseIds: [argTestClaims.for1._id, argTestClaims.for2._id] //give the ids of the two 'for' claims we created above
     })
     .set('Accept', 'application/json').set('Authorization', JWT)
     .expect(200)
@@ -136,7 +136,8 @@ describe('Testing basic Arguments', function() {
       argTestClaims.forArg = response.body.data.claim.arguments;
       
       assert(response.body.data.claim._id == argTestClaims.top._id, 'The parent claim should be the one returned');
-      assert(returnedArgs.length > 0, 'The claim should now have at least 1 argument');
+      assert(returnedArgs.length == 1, 'The claim should now have 1 argument');
+      assert(returnedArgs[0].type == 'FOR', 'The returned argument in the parent claim should be FOR');
 
       for (var a = 0; a < returnedArgs.length; a++) {
         returnedArgs[a]
@@ -144,6 +145,18 @@ describe('Testing basic Arguments', function() {
       }
 
 
+      done();
+    })
+  });
+
+  it('Getting the top claim should be returned with the argument we just created', function(done) {
+    api.get(`/claims/${argTestClaims.top._key}`)
+    .set('Accept', 'application/json').set('Authorization', JWT).expect(200)
+    .then((response) => {
+      assert(response.body.data.claim._id == argTestClaims.top._id, 'returned claim should have an _id');
+      assert(response.body.data.claim._key == argTestClaims.top._key, 'returned claim should have a _key');
+      assert(response.body.data.claim.arguments.length == 1, 'The top claim should now have the one argument we just added' + JSON.stringify(response.body.data.claim, null, 2));
+      argTestClaims.top = response.body.data.claim;
       done();
     })
   });
@@ -164,7 +177,7 @@ describe('Testing basic Arguments', function() {
       argTestClaims.arguments = response.body.data.claim.arguments;
       
       assert(response.body.data.claim._id == argTestClaims.top._id, 'The parent claim should be the one returned');
-      assert(response.body.data.claim.arguments.length > 1, 'The claim should now have at least 2 arguments');
+      assert(response.body.data.claim.arguments.length > 1, 'The claim should now have at least 2 arguments' + JSON.stringify(response.body.data.claim, null, 2)); 
 
       for (var a = 0; a < returnedArgs.length; a++) {
         assert(returnedArgs[a].probability, 'each returned argument should have a probability');
@@ -176,6 +189,19 @@ describe('Testing basic Arguments', function() {
         assert(returnedArgs[a].creationDate, 'each returned argument should have a creationDate property');
       }
 
+      done();
+    })
+  });
+
+  it('Getting the top claim should be returned with both the new arguments', function(done) {
+    api.get(`/claims/${argTestClaims.top._key}`)
+    .set('Accept', 'application/json').set('Authorization', JWT).expect(200)
+    .then((response) => {
+      console.log('WITH BOTH ---', JSON.stringify(response.body.data.claim, null, 2));
+      assert(response.body.data.claim._id == argTestClaims.top._id, 'returned claim should have an _id');
+      assert(response.body.data.claim._key == argTestClaims.top._key, 'returned claim should have a _key');
+      assert(response.body.data.claim.arguments.length == 2, 'The top claim should now have both the arguments we just added');
+      argTestClaims.top = response.body.data.claim;
       done();
     })
   });

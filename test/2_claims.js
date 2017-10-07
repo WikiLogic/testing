@@ -29,7 +29,7 @@ describe('Testing basic Claims', function() {
 
   
   //be sure to be logged in
-  it('The log in credentials you passed in should log us in', function(done) {
+  it('The log in credentials you set in api-credentials.json should log us in (the account should already exist)', function(done) {
     api.post('/login')
     .send({ username: credentials.username, password: credentials.password })
     .set('Accept', 'application/json')
