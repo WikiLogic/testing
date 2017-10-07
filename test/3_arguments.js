@@ -121,7 +121,7 @@ describe('Testing basic Arguments', function() {
   // =========================================================== 
 
   //invent a new argument and add it to that claim
-  it('Posting a new argument to the claim we just created should return that claim with arguments attached', function(done) {
+  it('new FOR argument to the top test claim, should return updated top test claim', function(done) {
     api.post('/arguments')
     .send({ 
       parentClaimId: argTestClaims.top._id, //pass the id of the first 'top' claim we created above
@@ -162,7 +162,7 @@ describe('Testing basic Arguments', function() {
   });
 
   //also add the against arguments
-  it('Posting a new argument to the claim we just created should return that claim with arguments attached', function(done) {
+  it('new AGAINST argument to the top test claim, should return updated top test claim', function(done) {
     api.post('/arguments')
     .send({ 
       parentClaimId: argTestClaims.top._id, //pass the id of the first 'top' claim we created above
