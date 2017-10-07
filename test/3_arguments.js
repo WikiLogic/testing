@@ -137,6 +137,9 @@ describe('Testing basic Arguments', function() {
       
       assert(response.body.data.claim._id == argTestClaims.top._id, 'The parent claim should be the one returned');
       assert(returnedArgs.length == 1, 'The claim should now have 1 argument');
+      assert.isNotNull(response.body.data.claim.probability, 'The claim should have a probability that is not null');
+      assert(typeof response.body.data.claim.probability == 'String' || typeof response.body.data.claim.probability == 'Number', 'The claim should have a probability which is at least a string or a number');
+      assert(response.body.data.claim.probability !== 'null' || response.body.data.claim.probability !== 'undefined' || response.body.data.claim.probability !== '', 'The claim should have a probability set');
       assert(returnedArgs[0].type == 'FOR', 'The returned argument in the parent claim should be FOR');
 
       for (var a = 0; a < returnedArgs.length; a++) {
@@ -156,6 +159,9 @@ describe('Testing basic Arguments', function() {
       assert(response.body.data.claim._id == argTestClaims.top._id, 'returned claim should have an _id');
       assert(response.body.data.claim._key == argTestClaims.top._key, 'returned claim should have a _key');
       assert(response.body.data.claim.arguments.length == 1, 'The top claim should now have the one argument we just added' + JSON.stringify(response.body.data.claim, null, 2));
+      assert.isNotNull(response.body.data.claim.probability, 'The claim should have a probability that is not null');
+      assert(typeof response.body.data.claim.probability == 'String' || typeof response.body.data.claim.probability == 'Number', 'The claim should have a probability which is at least a string or a number');
+      assert(response.body.data.claim.probability !== 'null' || response.body.data.claim.probability !== 'undefined' || response.body.data.claim.probability !== '', 'The claim should have a probability set');
       argTestClaims.top = response.body.data.claim;
       done();
     })
@@ -177,7 +183,10 @@ describe('Testing basic Arguments', function() {
       argTestClaims.arguments = response.body.data.claim.arguments;
       
       assert(response.body.data.claim._id == argTestClaims.top._id, 'The parent claim should be the one returned');
-      assert(response.body.data.claim.arguments.length > 1, 'The claim should now have at least 2 arguments' + JSON.stringify(response.body.data.claim, null, 2)); 
+      assert(response.body.data.claim.arguments.length == 2, 'The claim should now have 2 arguments' + JSON.stringify(response.body.data.claim, null, 2)); 
+      assert.isNotNull(response.body.data.claim.probability, 'The claim should have a probability that is not null');
+      assert(typeof response.body.data.claim.probability == 'String' || typeof response.body.data.claim.probability == 'Number', 'The claim should have a probability which is at least a string or a number');
+      assert(response.body.data.claim.probability !== 'null' || response.body.data.claim.probability !== 'undefined' || response.body.data.claim.probability !== '', 'The claim should have a probability set');
 
       for (var a = 0; a < returnedArgs.length; a++) {
         assert(returnedArgs[a].probability, 'each returned argument should have a probability');
@@ -201,6 +210,9 @@ describe('Testing basic Arguments', function() {
       assert(response.body.data.claim._id == argTestClaims.top._id, 'returned claim should have an _id');
       assert(response.body.data.claim._key == argTestClaims.top._key, 'returned claim should have a _key');
       assert(response.body.data.claim.arguments.length == 2, 'The top claim should now have both the arguments we just added');
+      assert.isNotNull(response.body.data.claim.probability, 'The claim should have a probability that is not null');
+      assert(typeof response.body.data.claim.probability == 'String' || typeof response.body.data.claim.probability == 'Number', 'The claim should have a probability which is at least a string or a number');
+      assert(response.body.data.claim.probability !== 'null' || response.body.data.claim.probability !== 'undefined' || response.body.data.claim.probability !== '', 'The claim should have a probability set');
       argTestClaims.top = response.body.data.claim;
       done();
     })
@@ -216,6 +228,9 @@ describe('Testing basic Arguments', function() {
       assert(response.body.data.claim.text == argTestClaims.top.text, 'Returned claim should have the text we\'re expecting');
       assert(response.body.data.claim._id == argTestClaims.top._id, 'Returned claim should have the id we\'re expecting');
       assert(response.body.data.claim.arguments.length == 2, 'Returned claim should have the the 2 arguments we added');
+      assert.isNotNull(response.body.data.claim.probability, 'The claim should have a probability that is not null');
+      assert(typeof response.body.data.claim.probability == 'String' || typeof response.body.data.claim.probability == 'Number', 'The claim should have a probability which is at least a string or a number');
+      assert(response.body.data.claim.probability !== 'null' || response.body.data.claim.probability !== 'undefined' || response.body.data.claim.probability !== '', 'The claim should have a probability set');
       assert(response.body.data.claim.arguments[0].hasOwnProperty('premises'), 'The arguments in the claim should have an array of premises');
       assert(response.body.data.claim.arguments[0].premises[0].hasOwnProperty('_id'), 'The premises in the argument should be populated');
       
