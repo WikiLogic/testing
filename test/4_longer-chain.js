@@ -73,9 +73,9 @@ describe('Testing a slightly longer chain', function() {
   it('Create Argument1', function(done) {
     api.post('/arguments')
     .send({ 
-      parentClaimId: apiData.claim1._key,
+      parentClaimId: apiData.claim1._id,
       type: 'FOR',
-      premiseIds: [apiData.claim2._key]
+      premiseIds: [apiData.claim2._id]
     })
     .set('Accept', 'application/json').set('Authorization', JWT)
     .expect(200)
@@ -90,9 +90,9 @@ describe('Testing a slightly longer chain', function() {
   it('Create Argument2', function(done) {
     api.post('/arguments')
     .send({ 
-      parentClaimId: apiData.claim2._key,
+      parentClaimId: apiData.claim2._id,
       type: 'FOR',
-      premiseIds: [apiData.claim3._key]
+      premiseIds: [apiData.claim3._id]
     })
     .set('Accept', 'application/json').set('Authorization', JWT)
     .expect(200)
@@ -141,17 +141,17 @@ describe('Testing a slightly longer chain', function() {
 
   //and finally the claims
   it('Delete claim1', function(done) {
-    api.del('/claims').send({ _key: apiData.claim1._key })
+    api.del('/claims').send({ _id: apiData.claim1._id })
     .set('Accept', 'application/json').set('Authorization', JWT)
     .expect(200, done);
   });
   it('Delete claim2', function(done) {
-    api.del('/claims').send({ _key: apiData.claim2._key })
+    api.del('/claims').send({ _id: apiData.claim2._id })
     .set('Accept', 'application/json').set('Authorization', JWT)
     .expect(200, done);
   });
   it('Delete claim3', function(done) {
-    api.del('/claims').send({ _key: apiData.claim3._key })
+    api.del('/claims').send({ _id: apiData.claim3._id })
     .set('Accept', 'application/json').set('Authorization', JWT)
     .expect(200, done);
   });

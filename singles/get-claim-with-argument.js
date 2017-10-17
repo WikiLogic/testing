@@ -3,12 +3,7 @@ var assert = require('chai').assert;
 var supertest = require('supertest');
 var api = supertest('http://localhost/api/v1');
 var async = require('async');
-var credentials;
-try {
-  credentials = require('../api-credentials.json');
-} catch(err) {
-  throw 'You need to create a api-credentials.json file in the root of this testing repo, rename api-credentials-example.json and add your api login';
-}
+
 
 describe('Authentication responses', function() {
   let JWT = '';
@@ -24,15 +19,25 @@ describe('Authentication responses', function() {
   }
   let apiData = {};
 
-  //be sure to be logged in
-  it('Log in', function(done) {
-    api.post('/login').send({ username: credentials.username, password: credentials.password })
-    .set('Accept', 'application/json').expect('Content-Type', /json/).expect(200)
+  //sign up the test user
+  it('Signup request should return 200 and the relevant data', function(done) {
+    api.post('/signup')
+    .send({ username: 'test', email: 'test@test.com', password: 'test' })
+    .set('Accept', 'application/json')
+    .expect(200)
     .then(response => {
+
+      assert(response.body.data.user.username == 'test', 'The new user should have the username we signed up with');
+      var datetime = new Date().toISOString().replace(/T/, ' ').substr(0, 10);
+      assert(response.body.data.user.signUpDate == datetime, 'The new user\'s sign up date should be today');
+
       JWT = `JWT ${response.body.data.token}`;
       done();
-    })
+    }).catch((err) => {
+      console.log("test promise error?", err);
+    });
   });
+  
 
   //make the 2 claims
   it('Create Claim', function(done) {
@@ -60,9 +65,9 @@ describe('Authentication responses', function() {
   it('Create Argument', function(done) {
     api.post('/arguments')
     .send({ 
-      parentClaimId: apiData.claim1._key,
+      parentClaimId: apiData.claim1._id,
       type: 'FOR',
-      premiseIds: [apiData.claim2._key]
+      premiseIds: [apiData.claim2._id]
     })
     .set('Accept', 'application/json').set('Authorization', JWT)
     .expect(200)

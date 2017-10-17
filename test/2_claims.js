@@ -84,7 +84,6 @@ describe('Testing basic Claims', function() {
       assert(response.body.data.claim.text == srcSimilarTestClaim.text, 'Returned new claim should have the text we set');
       assert.exists(response.body.data.claim._id, 'Returned new claim should have a ._id');
       assert.exists(response.body.data.claim._key, 'Returned new claim should have a ._key');
-      assert(!response.body.hasOwnProperty('errors'), 'If it was returning an existing claim, there would be errors.');
       similarTestClaim = response.body.data.claim;
       done();
     });
@@ -138,13 +137,13 @@ describe('Testing basic Claims', function() {
 
   //Delete the claim we just created
   it('Delete the test claim', function(done) {
-    api.del('/claims').send({ _key: testClaim._key })
+    api.del('/claims').send({ _id: testClaim._id })
     .set('Accept', 'application/json').set('Authorization', JWT)
     .expect(200, done);
   });
 
   it('Delete the similar test claim', function(done) {
-    api.del('/claims').send({ _key: similarTestClaim._key })
+    api.del('/claims').send({ _id: similarTestClaim._id })
     .set('Accept', 'application/json').set('Authorization', JWT)
     .expect(200, done);
   });
