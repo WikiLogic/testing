@@ -18,6 +18,10 @@ describe('Testing basic Claims', function() {
     text: 'Mocha', 
     probability: '55' 
   }
+  let srcUndefinedProbabilityTestClaim = {
+    text: 'Mocha undefined probability claim',
+    probability: undefined
+  }
   let testClaim = {};
   let similarTestClaim = {};
   
@@ -85,6 +89,40 @@ describe('Testing basic Claims', function() {
       assert.exists(response.body.data.claim._id, 'Returned new claim should have a ._id');
       assert.exists(response.body.data.claim._key, 'Returned new claim should have a ._key');
       similarTestClaim = response.body.data.claim;
+      done();
+    });
+  });
+
+  //Create a claim with similar text to the one above - should return a new claim, not the one above
+  it('Posting claim with similar text should return a new claim, not the existing one', function(done) {
+    api.post('/claims')
+    .send({ text: srcSimilarTestClaim.text, probability: srcSimilarTestClaim.probability })
+    .set('Accept', 'application/json')
+    .set('Authorization', JWT)
+    .expect(200)
+    .then((response) => {
+
+      assert(response.body.data.claim.text == srcSimilarTestClaim.text, 'Returned new claim should have the text we set');
+      assert.exists(response.body.data.claim._id, 'Returned new claim should have a ._id');
+      assert.exists(response.body.data.claim._key, 'Returned new claim should have a ._key');
+      similarTestClaim = response.body.data.claim;
+      done();
+    });
+  });
+
+  //Create a claim with similar text to the one above - should return a new claim, not the one above
+  it('Posting claim with undefined probability should return a new claim presuming 0.5 probability', function(done) {
+    api.post('/claims')
+    .send({ text: srcUndefinedProbabilityTestClaim.text, probability: undefined })
+    .set('Accept', 'application/json')
+    .set('Authorization', JWT)
+    .expect(200)
+    .then((response) => {
+
+      assert(response.body.data.claim.text == srcUndefinedProbabilityTestClaim.text, 'Returned new claim should have the text we set');
+      assert.exists(response.body.data.claim._id, 'Returned new claim should have a ._id');
+      assert.exists(response.body.data.claim._key, 'Returned new claim should have a ._key');
+      undefinedProbabilityTestClaim = response.body.data.claim;
       done();
     });
   });
